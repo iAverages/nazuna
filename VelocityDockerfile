@@ -1,0 +1,16 @@
+FROM alpine/curl as deps
+
+RUN curl https://api.papermc.io/v2/projects/velocity/versions/3.2.0-SNAPSHOT/builds/225/downloads/velocity-3.2.0-SNAPSHOT-225.jar -o server.jar
+
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+COPY --from=deps server.jar server.jar
+
+COPY servers/velocity/plugins /app/plugins
+COPY servers/velocity/velocity.toml /app
+
+RUN echo "development" > forwarding.secret
+
+ENTRYPOINT ["java", "-Xms512M", "-Xmx512M", "-XX:+UseG1GC", "-XX:G1HeapRegionSize=4M", "-XX:+UnlockExperimentalVMOptions", "-XX:+ParallelRefProcEnabled", "-XX:+AlwaysPreTouch", "-jar", "server.jar"]

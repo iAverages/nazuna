@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "7.1.0"
+}
+
+group 'dev.avrg'
+version '0.1.0'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.Minestom:Minestom:aebf72de90'
+    implementation "com.google.code.gson:gson:2.10.1"
+    implementation "redis.clients:jedis:4.3.0"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'dev.avrg.minestom.Nazuna',
+                "Multi-Release": true
+    }
+}

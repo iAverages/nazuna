@@ -1,0 +1,4 @@
+name: Nazuna
+version: '${version}'
+main: avrg.dev.nazuna.paper.Nazuna
+api-version: 1.19

@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nazuna-proxy
+  namespace: nazuna
+  labels:
+    app: nazuna-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nazuna-proxy
+  template:
+    metadata:
+      labels:
+        app: nazuna-proxy
+    spec:
+      containers:
+        - image: ctr.avrg.dev/nazuna/proxy:dev
+          imagePullPolicy: Always
+          name: nazuna-proxy
+          ports:
+            - containerPort: 25577
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nazuna-paper
+  namespace: nazuna
+  labels:
+    app: nazuna-paper
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nazuna-paper
+  template:
+    metadata:
+      labels:
+        app: nazuna-paper
+    spec:
+      containers:
+        - image: ctr.avrg.dev/nazuna/paper:dev
+          imagePullPolicy: Always
+          name: nazuna-paper
+          ports:
+            - containerPort: 25565
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nazuna-minestom
+  namespace: nazuna
+  labels:
+    app: nazuna-minestom
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nazuna-minestom
+  template:
+    metadata:
+      labels:
+        app: nazuna-minestom
+    spec:
+      containers:
+        - image: ctr.avrg.dev/nazuna/minestom:dev
+          imagePullPolicy: Always
+          name: nazuna-minestom
+          ports:
+            - containerPort: 25565
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: VELOCITY_FORWARDING_SECRET
+              value: "development"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nazuna-proxy-service
+  namespace: nazuna
+spec:
+  type: NodePort
+  ports:
+    - name: nazuna-proxy
+      port: 25577
+      targetPort: 25577
+      nodePort: 25565
+  selector:
+    app: nazuna-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: nazuna
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        name: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          ports:
+            - name: redis
+              containerPort: 6379
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: nazuna
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: redis-port
+      protocol: TCP
+      port: 6379
+      targetPort: 6379

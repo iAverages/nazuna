@@ -1,0 +1,21 @@
+FROM alpine/curl as deps
+
+RUN curl https://api.papermc.io/v2/projects/paper/versions/1.19.3/builds/396/downloads/paper-1.19.3-396.jar -o server.jar
+
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+COPY --from=deps server.jar server.jar
+
+COPY servers/paper/plugins /app/plugins
+COPY servers/paper/config /app/config
+COPY servers/paper/*.yml /app/
+COPY servers/paper/*.yaml /app/
+COPY servers/paper/*.jar /app/
+COPY servers/paper/*.json /app/
+COPY servers/paper/server.properties /app/
+
+RUN echo "eula=true" > eula.txt
+
+ENTRYPOINT ["java", "-jar", "server.jar"]

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="avrg.dev.nazuna.velocity.nazuna" target="11" />
+      <module name="avrg.dev.nazuna.velocity.nazuna.main" target="11" />
+      <module name="avrg.dev.nazuna.velocity.nazuna.test" target="11" />
+      <module name="dev.avrg.nazuna.velocity.nazuna" target="11" />
+      <module name="dev.avrg.nazuna.velocity.nazuna.main" target="11" />
+      <module name="dev.avrg.nazuna.velocity.nazuna.test" target="11" />
+      <module name="minestom" target="17" />
+      <module name="minestom_main" target="17" />
+      <module name="minestom_test" target="17" />
+      <module name="paper" target="17" />
+      <module name="Paper" target="17" />
+      <module name="Velocity" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
