@@ -21,36 +21,39 @@ spec:
           name: nazuna-proxy
           ports:
             - containerPort: 25577
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nazuna-paper
-  namespace: nazuna
-  labels:
-    app: nazuna-paper
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: nazuna-paper
-  template:
-    metadata:
-      labels:
-        app: nazuna-paper
-    spec:
-      containers:
-        - image: ctr.avrg.dev/nazuna/paper:dev
-          imagePullPolicy: Always
-          name: nazuna-paper
-          ports:
-            - containerPort: 25565
           env:
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
+            - name: APP_ENV
+              value: "DEBUG"
 ---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: nazuna-paper
+#  namespace: nazuna
+#  labels:
+#    app: nazuna-paper
+#spec:
+#  replicas: 2
+#  selector:
+#    matchLabels:
+#      app: nazuna-paper
+#  template:
+#    metadata:
+#      labels:
+#        app: nazuna-paper
+#    spec:
+#      containers:
+#        - image: ctr.avrg.dev/nazuna/paper:dev
+#          imagePullPolicy: Always
+#          name: nazuna-paper
+#          ports:
+#            - containerPort: 25565
+#          env:
+#            - name: POD_IP
+#              valueFrom:
+#                fieldRef:
+#                  fieldPath: status.podIP
+#---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -59,7 +62,7 @@ metadata:
   labels:
     app: nazuna-minestom
 spec:
-  replicas: 2
+  replicas: 8
   selector:
     matchLabels:
       app: nazuna-minestom

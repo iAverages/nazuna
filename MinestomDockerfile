@@ -2,6 +2,6 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-COPY servers/minestom /app
+COPY minestom/build/libs/minestom-0.1.0-all.jar /app
 
 ENTRYPOINT ["java", "-jar", "minestom-0.1.0-all.jar"]

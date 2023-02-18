@@ -10,6 +10,7 @@ COPY --from=deps server.jar server.jar
 
 COPY servers/velocity/plugins /app/plugins
 COPY servers/velocity/velocity.toml /app
+COPY velocity/build/libs/Nazuna-Velocity-0.1.0.jar /app/plugins
 
 RUN echo "development" > forwarding.secret
 

@@ -9,6 +9,8 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minestom.server.event.server.ServerTickMonitorEvent;
+import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
@@ -48,7 +50,14 @@ public final class Nazuna {
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(new Pos(0, 42, 0));
         });
+
         AtomicReference<TickMonitor> lastTick = new AtomicReference<>();
+
+        globalEventHandler.addListener(ServerTickMonitorEvent.class, event -> {
+            final TickMonitor monitor = event.getTickMonitor();
+            lastTick.set(monitor);
+        });
+
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             Collection<Player> players = MinecraftServer.getConnectionManager().getOnlinePlayers();
             if (players.isEmpty()) return;
@@ -58,16 +67,19 @@ public final class Nazuna {
             final long ramUsage = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024;
 
             final Component header = Component.newline()
-                    .append(Component.newline()).append(Component.text("Players: " + players.size()))
-                    .append(Component.newline()).append(Component.newline())
+                    .append(Component.newline()).append(Component.text("Local Players: " + players.size()))
+                    .append(Component.newline()).append(Component.newline());
+
+            final Component footer = Component.newline()
                     .append(Component.text("RAM USAGE: " + ramUsage + " MB", NamedTextColor.GRAY).append(Component.newline())
-                            .append(Component.text("TICK TIME: " + MathUtils.round(tickMonitor.getTickTime(), 2) + "ms", NamedTextColor.GRAY))).append(Component.newline());
-            Audiences.players().sendPlayerListHeader(header);
+                    .append(Component.text("TICK TIME: " + MathUtils.round(tickMonitor.getTickTime(), 2) + "ms", NamedTextColor.GRAY))).append(Component.newline());
+
+            Audiences.players().sendPlayerListHeaderAndFooter(header, footer);
 
         }, TaskSchedule.tick(10), TaskSchedule.tick(10));
 
         globalEventHandler.addListener(PlayerChatEvent.class, event -> {
-            Nazuna.redis.publish("message", String.format("<%s>: %s", event.getPlayer().getUsername(), event.getMessage()));
+            Nazuna.redis.publish("message", String.format("<%s> %s", event.getPlayer().getUsername(), event.getMessage()));
         });
 
         // Start the server on port 25565
@@ -84,6 +96,8 @@ public final class Nazuna {
         if (velocityToken != null && !velocityToken.isEmpty()) {
             LOGGER.info("Found Velocity forwarding secret, enabling Velocity support");
             VelocityProxy.enable(velocityToken);
+        } else {
+            MojangAuth.init();
         }
 
         MinecraftServer.getSchedulerManager().buildShutdownTask(Nazuna::onShutdown);
